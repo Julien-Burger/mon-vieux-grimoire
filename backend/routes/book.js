@@ -8,11 +8,11 @@ const sharp = require("../middlewares/sharp");
 const router = express.Router();
 
 router.get("/bestrating", bookCtrl.bestRating);
-router.post("/", authMdw, multerConfig, bookCtrl.createBook);
+router.post("/", authMdw, multerConfig, sharp, bookCtrl.createBook);
 router.get("/", bookCtrl.getAllBooks);
 router.get("/:id", bookCtrl.getBook);
 router.delete("/:id", authMdw, bookCtrl.deleteBook);
 router.post("/:id/rating", authMdw, bookCtrl.rateBook);
-router.put("/:id", authMdw, multerConfig, bookCtrl.updateBook);
+router.put("/:id", authMdw, multerConfig, sharp, bookCtrl.updateBook);
 
 module.exports = router;

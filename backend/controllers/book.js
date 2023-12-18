@@ -95,14 +95,13 @@ module.exports.updateBook = async (req, res) => {
             : { ...req.body };
 
         const book = await Book.findOne({ _id: req.params.id });
-        console.log(req.params.id);
+
         if (!book) res.status(404).json({ message: "No book found." });
         if (book.userId != req.auth.userId) res.status(401).json({ message: "You don't have permission." });
 
         await Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id });
 
         res.status(200).json({ message: "Book updated." });
-        //TO DO: supprimer l'image de la base s'il y en avait déjà une
     } catch (err) {
         res.status(400).json({ err });
     }
