@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
-const sanitize = require("mongo-sanitize");
+const sanitize = require("express-mongo-sanitize");
 require("dotenv").config();
 
 const bookRoutes = require("./routes/book");

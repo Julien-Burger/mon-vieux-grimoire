@@ -14,5 +14,7 @@ module.exports = async (req, res, next) => {
             .toFile(path.resolve(req.file.destination, req.file.filename));
 
         fs.unlinkSync(req.file.path);
+
+        next();
     }
 };

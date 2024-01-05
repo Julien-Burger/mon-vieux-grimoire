@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const rateLimit = require("express-rate-limit");
+const { body } = require("express-validator");
 
 const userCtrl = require("../controllers/user");
 
