@@ -1,16 +1,22 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 require("dotenv").config();
 
 const User = require("../models/User");
 
 module.exports.signup = async (req, res) => {
     try {
-        const hasPassword = await bcrypt.hash(req.body.password, 10);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({ message: errors.array() });
+        }
+
+        const hashPassword = await bcrypt.hash(req.body.password, 10);
 
         const user = new User({
             email: req.body.email,
-            password: hasPassword,
+            password: hashPassword,
         });
 
         await user.save();

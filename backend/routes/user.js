@@ -3,7 +3,11 @@ const router = express.Router();
 const rateLimit = require("express-rate-limit");
 
 const userCtrl = require("../controllers/user");
-const validator = require("../middlewares/validator.js");
+
+const loginValidator = [
+    body("email").isEmail().withMessage("Enter a valid email."),
+    body("password").isLength({ min: 8 }).withMessage("Password need at least 8 characters."),
+];
 
 const limiter = rateLimit({
     windowMs: 3 * 60 * 1000, // 15 minutes
@@ -13,7 +17,7 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-router.post("/signup", userCtrl.signup);
+router.post("/signup", loginValidator, userCtrl.signup);
 router.post("/login", limiter, userCtrl.login);
 
 module.exports = router;
