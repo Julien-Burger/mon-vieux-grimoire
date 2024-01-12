@@ -16,7 +16,7 @@ module.exports.createBook = async (req, res) => {
 
         await book.save();
 
-        res.status(201).json({ message: "Book successfuly created! " });
+        res.status(201).json({ message: "Book successfuly created!" });
     } catch (err) {
         res.status(400).json({ err });
     }
@@ -24,7 +24,7 @@ module.exports.createBook = async (req, res) => {
 
 module.exports.getAllBooks = async (req, res) => {
     try {
-        await Book.find();
+        const books = await Book.find();
 
         res.status(200).json(books);
     } catch (err) {
@@ -44,7 +44,7 @@ module.exports.getBook = async (req, res) => {
 
 module.exports.bestRating = async (req, res) => {
     try {
-        const books = await Book.find();
+        let books = await Book.find();
 
         books.sort((a, b) => {
             return a.averageRating - b.averageRating;
@@ -63,7 +63,13 @@ module.exports.deleteBook = async (req, res) => {
     try {
         const book = await Book.findOne({ _id: req.params.id });
 
-        if (!book) res.status(404).json({ message: "No book found." });
+        if (!book) {
+            return res.status(404).json({ message: "No book found." });
+        }
+
+        if (book.userId != req.auth.userId) {
+            return res.status(401).json({ message: "Access denied!" });
+        }
 
         fs.unlinkSync(book.imageUrl.replace(`${req.protocol}://${req.get("host")}`, "."));
 
@@ -77,14 +83,18 @@ module.exports.deleteBook = async (req, res) => {
 
 module.exports.rateBook = async (req, res) => {
     try {
-        if (req.body.grade > 5 || req.body.grade < 0) return res.status(400).json({ message: "Invalid rate number." });
+        if (req.body.grade > 5 || req.body.grade < 0) {
+            return res.status(400).json({ message: "Invalid rate number." });
+        }
 
         const book = await Book.findOne({ _id: req.params.id });
 
         let ratings = book.ratings;
 
         for (let rate of ratings) {
-            if (req.auth == rate.userId) return res.status(400).json({ message: "User already rate this book." });
+            if (req.auth.userId == rate.userId) {
+                return res.status(400).json({ message: "User already rate this book." });
+            }
         }
 
         ratings.push({
@@ -96,7 +106,6 @@ module.exports.rateBook = async (req, res) => {
 
         for (let rating of ratings) {
             averageRating += parseInt(rating.grade);
-            console.log(rating.grade);
         }
 
         averageRating /= ratings.length;

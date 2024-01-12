@@ -31,15 +31,19 @@ module.exports.login = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
 
-        if (!user) return res.status(401).json({ message: "Mail / password incorrect." });
+        if (!user) {
+            return res.status(401).json({ message: "Mail / password incorrect." });
+        }
 
-        bcrypt.compare(req.body.password, user.password).then(valid => {
-            if (valid)
-                res.status(200).json({
-                    userId: user._id,
-                    token: jwt.sign({ userId: user._id }, process.env.TOKEN, { expiresIn: "24h" }),
-                });
-            else return res.status(401).json({ message: "Mail / password incorrect." });
+        const valid = await bcrypt.compare(req.body.password, user.password);
+
+        if (!valid) {
+            return res.status(401).json({ message: "Mail / password incorrect." });
+        }
+
+        res.status(200).json({
+            userId: user._id,
+            token: jwt.sign({ userId: user._id }, process.env.TOKEN, { expiresIn: "24h" }),
         });
     } catch (err) {
         res.status(500).json({ err });

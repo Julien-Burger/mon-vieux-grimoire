@@ -12,7 +12,7 @@ const multerFilter = (req, file, callback) => {
     if (file.mimetype.startsWith("image")) {
         callback(null, true);
     } else {
-        callback({ message: "Ton fichier est moisi." }, false);
+        callback({ message: "Accept only jpeg, jpg, png, webp." }, false);
     }
 };
 
@@ -39,7 +39,7 @@ const upload = multer({
 });
 
 module.exports = (req, res, next) => {
-    upload.single("image")(req, res, error => {
+    upload.single("image")(req, res, (error) => {
         if (error) return res.status(400).send({ error });
 
         next();

@@ -4,6 +4,7 @@ const path = require("path");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const sanitize = require("express-mongo-sanitize");
+const fs = require("fs");
 require("dotenv").config();
 
 const bookRoutes = require("./routes/book");
@@ -34,6 +35,17 @@ app.use((req, res, next) => {
     next();
 });
 app.use(sanitize({ replaceWith: "_" }));
+
+if (!fs.existsSync("/images")) {
+    fs.mkdir(path.join(__dirname, "images"), (err) => {
+        if (err) {
+            return console.error(err);
+        }
+
+        console.log("Directory created successfully!");
+    });
+}
+
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/api/books", bookRoutes);
